@@ -4,6 +4,8 @@ import { handleRegistration } from "../player/handleRegistration";
 import { handleCreateRoom } from "../room/handleCreateRoom";
 import { handleAddUserToRoom } from "../room/handleAddUserToRoom";
 import { handleAddShips } from "../ships/handleAddShips";
+import { handleAttack } from "../game/handleAttack";
+import { handleRandomAttack } from "../game/handleRandomAttack";
 
 export const handleMessage = (ws: WebSocket, raw: RawData) => {
   let rawStr: string;
@@ -46,6 +48,12 @@ export const handleMessage = (ws: WebSocket, raw: RawData) => {
     }
     case "add_ships":
       handleAddShips(ws, msg.data);
+      break;
+    case "attack":
+      handleAttack(ws, msg.data);
+      break;
+    case "randomAttack":
+      handleRandomAttack(ws, msg.data);
       break;
     default:
       console.log("Unknown message type:", msg.type);

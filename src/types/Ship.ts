@@ -3,4 +3,6 @@ export interface Ship {
   direction: boolean;
   length: number;
   type: "small" | "medium" | "large" | "huge";
+  hits?: number;
+  destroyed?: boolean;
 }
