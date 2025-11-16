@@ -13,11 +13,12 @@ export const handleAddUserToRoom = (ws: WebSocket, roomId: string) => {
   const targetRoom = rooms[roomId];
   if (!targetRoom) return;
 
-  if (player.roomId) {
+  if (player.roomId && player.roomId !== roomId) {
     const currentRoom = rooms[player.roomId];
     if (currentRoom) {
       if (currentRoom.players.length === 1) {
         delete rooms[player.roomId];
+        player.roomId = undefined;
       } else {
         return;
       }
@@ -29,6 +30,7 @@ export const handleAddUserToRoom = (ws: WebSocket, roomId: string) => {
     player.roomId = roomId;
   }
 
+  // Create game if 2 players
   if (targetRoom.players.length === 2) {
     const gameId = targetRoom.id;
     games[gameId] = {
@@ -42,17 +44,19 @@ export const handleAddUserToRoom = (ws: WebSocket, roomId: string) => {
 
     targetRoom.players.forEach((p) => {
       const wsClient = playerWsMap.get(p.id);
-      if (wsClient && wsClient.readyState === WebSocket.OPEN) {
+      if (wsClient?.readyState === WebSocket.OPEN) {
         sendMessage(wsClient, "create_game", { idGame: gameId, idPlayer: p.id });
       }
     });
   }
 
-  sendMessageToRoom(roomId);
+  sendUpdateRoom(targetRoom);
+
+  sendUpdateAllRooms();
 };
 
-const sendMessageToRoom = (roomId: string) => {
-  const room = rooms[roomId];
+// Update current room
+export const sendUpdateRoom = (room: (typeof rooms)[string]) => {
   if (!room) return;
 
   const roomData = {
@@ -62,8 +66,22 @@ const sendMessageToRoom = (roomId: string) => {
 
   room.players.forEach((player) => {
     const wsClient = playerWsMap.get(player.id);
-    if (wsClient && wsClient.readyState === WebSocket.OPEN) {
+    if (wsClient?.readyState === WebSocket.OPEN) {
       sendMessage(wsClient, "update_room", [roomData]);
+    }
+  });
+};
+
+// Update all room for all players
+export const sendUpdateAllRooms = () => {
+  const roomsData = Object.values(rooms).map((room) => ({
+    roomId: room.id,
+    roomUsers: room.players.map((player) => ({ name: player.name, index: player.id })),
+  }));
+
+  playerWsMap.forEach((ws) => {
+    if (ws.readyState === WebSocket.OPEN) {
+      sendMessage(ws, "update_room", roomsData);
     }
   });
 };

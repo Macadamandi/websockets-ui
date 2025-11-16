@@ -4,6 +4,7 @@ import { sendMessage } from "../../helpers/sendMessage";
 import { games } from "../../db/inMemoryDB";
 import { handleStartGame } from "./handleStartGame";
 
+// Check if both players set all ships
 const allPlayersReady = (gameId: string) => {
   const game = games[gameId];
   if (!game) return false;

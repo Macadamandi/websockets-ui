@@ -30,6 +30,7 @@ export const allShipsDestroyed = (ships: Ship[]) => {
   return ships.every((ship) => ship.destroyed === true);
 };
 
+// Get cells around killed ship
 export const getSurroundingCells = (ship: Ship, fieldSize = 10) => {
   const cells: { x: number; y: number }[] = [];
 

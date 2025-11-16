@@ -1,5 +1,5 @@
 import { WebSocketServer, WebSocket } from "ws";
-import { handleMessage } from "../handlers/message/handleMessage";
+import { handleMessage } from "../handlers/Message/handleMessage";
 import { players, rooms, playerWsMap } from "../db/inMemoryDB";
 
 export const createWsServer = (port: number) => {
@@ -13,8 +13,10 @@ export const createWsServer = (port: number) => {
     ws.on("close", () => {
       console.log("Client disconnected");
 
+      // Player disconnects
       const playerId = [...playerWsMap.entries()].find(([_, w]) => w === ws)?.[0];
       if (playerId) {
+        console.log(`Player ${players[playerId]} disconnected`);
         playerWsMap.delete(playerId);
 
         const player = players[playerId];
@@ -24,8 +26,10 @@ export const createWsServer = (port: number) => {
             room.players = room.players.filter((p) => p.id !== playerId);
             if (room.players.length === 0) {
               delete rooms[player.roomId];
+              console.log(`Room ${player.roomId} deleted because it became empty`);
             }
           }
+          player.roomId = null;
         }
       }
     });

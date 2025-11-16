@@ -10,6 +10,7 @@ export const handleStartGame = (gameId: string) => {
     game.currentPlayerId = firstPlayerId;
   }
 
+  // Send start game for both players
   Object.values(game.players).forEach((player) => {
     const ws = playerWsMap.get(player.id);
     if (ws && ws.readyState === WebSocket.OPEN) {

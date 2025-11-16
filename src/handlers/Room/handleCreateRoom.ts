@@ -1,8 +1,8 @@
 import { WebSocket } from "ws";
 import { rooms, players } from "../../db/inMemoryDB";
 import { generateUUID } from "../../helpers/generateUUID";
-import { handleUpdateRoom } from "./handleUpdateRoom";
 import { getPlayerId } from "../../helpers/getPlayerId";
+import { sendUpdateAllRooms, sendUpdateRoom } from "./handleAddUserToRoom";
 
 export const handleCreateRoom = (ws: WebSocket) => {
   const playerId = getPlayerId(ws);
@@ -20,5 +20,7 @@ export const handleCreateRoom = (ws: WebSocket) => {
 
   player.roomId = roomId;
 
-  handleUpdateRoom();
+  sendUpdateRoom(rooms[roomId]);
+
+  sendUpdateAllRooms();
 };
