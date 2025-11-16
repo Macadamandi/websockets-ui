@@ -1,5 +1,5 @@
 import { WebSocketServer, WebSocket } from "ws";
-import { handleMessage } from "../handlers/Message/handleMessage";
+import { handleMessage } from "../handlers/message/handleMessage";
 import { players, rooms, playerWsMap } from "../db/inMemoryDB";
 
 export const createWsServer = (port: number) => {

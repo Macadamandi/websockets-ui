@@ -1,8 +1,9 @@
 import { WebSocket, RawData } from "ws";
 import { ClientMessage } from "../../types/ClientMessage";
-import { handleRegistration } from "../Player/handleRegistration";
-import { handleCreateRoom } from "../Room/handleCreateRoom";
-import { handleAddUserToRoom } from "../Room/handleAddUserToRoom";
+import { handleRegistration } from "../player/handleRegistration";
+import { handleCreateRoom } from "../room/handleCreateRoom";
+import { handleAddUserToRoom } from "../room/handleAddUserToRoom";
+import { handleAddShips } from "../ships/handleAddShips";
 
 export const handleMessage = (ws: WebSocket, raw: RawData) => {
   let rawStr: string;
@@ -32,7 +33,7 @@ export const handleMessage = (ws: WebSocket, raw: RawData) => {
       break;
     case "add_user_to_room": {
       try {
-        const data = JSON.parse(msg.data); 
+        const data = JSON.parse(msg.data);
         if (!data.indexRoom) {
           console.log("add_user_to_room missing indexRoom");
           return;
@@ -43,6 +44,9 @@ export const handleMessage = (ws: WebSocket, raw: RawData) => {
       }
       break;
     }
+    case "add_ships":
+      handleAddShips(ws, msg.data);
+      break;
     default:
       console.log("Unknown message type:", msg.type);
   }

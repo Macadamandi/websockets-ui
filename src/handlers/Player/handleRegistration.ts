@@ -3,7 +3,7 @@ import { ClientMessage } from "../../types/ClientMessage";
 import { sendMessage } from "../../helpers/sendMessage";
 import { players, playerWsMap } from "../../db/inMemoryDB";
 import { generateUUID } from "../../helpers/generateUUID";
-import { handleUpdateRoom } from "../Room/handleUpdateRoom";
+import { handleUpdateRoom } from "../room/handleUpdateRoom";
 
 export const handleRegistration = (ws: WebSocket, msg: ClientMessage) => {
   const { name, password } = JSON.parse(msg.data);

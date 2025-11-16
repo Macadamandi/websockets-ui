@@ -1,7 +1,6 @@
 import { WebSocket } from "ws";
-import { rooms, players, playerWsMap } from "../../db/inMemoryDB";
+import { rooms, players, playerWsMap, games } from "../../db/inMemoryDB";
 import { sendMessage } from "../../helpers/sendMessage";
-import { handleUpdateRoom } from "./handleUpdateRoom";
 import { getPlayerId } from "../../helpers/getPlayerId";
 
 export const handleAddUserToRoom = (ws: WebSocket, roomId: string) => {
@@ -31,13 +30,22 @@ export const handleAddUserToRoom = (ws: WebSocket, roomId: string) => {
   }
 
   if (targetRoom.players.length === 2) {
+    const gameId = targetRoom.id;
+    games[gameId] = {
+      id: gameId,
+      players: {
+        [targetRoom.players[0].id]: { id: targetRoom.players[0].id },
+        [targetRoom.players[1].id]: { id: targetRoom.players[1].id },
+      },
+      currentPlayerId: null,
+    };
+
     targetRoom.players.forEach((p) => {
       const wsClient = playerWsMap.get(p.id);
-      if (wsClient) {
-        sendMessage(wsClient, "create_game", { idGame: roomId, idPlayer: p.id });
+      if (wsClient && wsClient.readyState === WebSocket.OPEN) {
+        sendMessage(wsClient, "create_game", { idGame: gameId, idPlayer: p.id });
       }
     });
-    handleUpdateRoom();
   }
 
   sendMessageToRoom(roomId);
